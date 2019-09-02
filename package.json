@@ -6,7 +6,9 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "tslint src/**/*.ts* --project tsconfig.json",
-    "server": "node ./server"
+    "server": "node ./server",
+    "ios": "react-native run-ios",
+    "android": "react-native run-android"
   },
   "dependencies": {
     "faker": "^4.1.0",

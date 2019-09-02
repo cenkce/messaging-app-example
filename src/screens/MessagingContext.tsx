@@ -56,8 +56,11 @@ export function MessagingServiceProvider(props: PropsWithChildren<{}>) {
   </MessagingServiceContext.Provider>;
 }
 
+const host = '165.22.157.197';
+const port = '80';
+
 function getUrl(endpoint: string) {
-  return 'http://localhost:3000/' + endpoint;
+  return `http://${host}:${port}/${endpoint}`;
 }
 
 export function useUserInfo(name?: string) {

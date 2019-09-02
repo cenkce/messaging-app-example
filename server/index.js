@@ -10,19 +10,6 @@ server.use(bodyParser.json());
 
 const {generate} = require('short-id');
 
-// server.use((req, res, next) => {
-//  if (req.body.name.length > 2) {
-//    next();
-//  } else {
-//    res.sendStatus(401);
-//  }
-// })
-
-// const user = {
-//   id: faker.random.uuid(),
-//   "avatarUrl": "https://randomuser.me/api/portraits/women/65.jpg",
-//   namm: "Jane Wright"
-// }
 
 function createMessage(text){
   return {
@@ -44,6 +31,7 @@ function generateMessage(){
 }
 
 let latest = [];
+let initialMessages = db.messages.slice();
 
 setInterval(() => {
   const message = generateMessage();
@@ -51,9 +39,23 @@ setInterval(() => {
   db.messages.push(message);
 }, 30000);
 
+// Resets messages every 10 mmiutes.
+setInterval(() => {
+  const message = generateMessage();
+  latest = [];
+  db.messages = initialMessages;
+}, 600000);
+
+
 server.get('/messages/latest', (req, res) => {
   res.json(latest);
   latest = [];
+});
+
+server.get('/reset', (req, res) => {
+  latest = [];
+  db.messages = [];
+  res.json({message: 'ok'});
 });
 
 server.use((req, res, next) => {
