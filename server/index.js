@@ -64,6 +64,6 @@ server.use((req, res, next) => {
 });
 server.use(middlewares)
 server.use(router)
-server.listen(3000, () => {
+server.listen(process.env.PORT || 3000, '0.0.0.0', () => {
   console.log('JSON Server is running')
 })
