@@ -40,6 +40,7 @@ function generateUser(name){
 
 let latest = [];
 let initialMessages = db.messages.slice();
+let initialUsers = db.users.slice();
 
 server.get('/messages/latest', (req, res) => {
   res.json(latest);
@@ -55,7 +56,8 @@ server.get('/messages/addRandom', (req, res) => {
 
 server.get('/reset', (req, res) => {
   latest = [];
-  db.messages = [];
+  db.messages = initialMessages;
+  db.users = initialUsers;
   res.json({message: 'ok'});
 });
 
