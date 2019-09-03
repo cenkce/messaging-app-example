@@ -1,6 +1,6 @@
 import { NavigationScreenComponent, NavigationScreenOptions } from "react-navigation";
 
-export type ScreenComponent<T = null> = NavigationScreenComponent<null, NavigationScreenOptions, T>;
+export type ScreenComponent<T = null> = NavigationScreenComponent<{ title: string }, NavigationScreenOptions, T>;
 export type MessageResponseType = {
   id: string,
   user: {

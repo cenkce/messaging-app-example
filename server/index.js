@@ -30,22 +30,16 @@ function generateMessage(){
   }
 }
 
+function generateUser(name){
+  return  {
+    id: faker.random.uuid(),
+    name: name || faker.internet.userName(),
+    avatarUrl: faker.image.avatar()
+  }
+}
+
 let latest = [];
 let initialMessages = db.messages.slice();
-
-// setInterval(() => {
-//   const message = generateMessage();
-//   latest.push(message);
-//   db.messages.push(message);
-// }, 30000);
-
-// Resets messages every 10 mmiutes.
-// setInterval(() => {
-//   const message = generateMessage();
-//   latest = [];
-//   db.messages = initialMessages;
-// }, 600000);
-
 
 server.get('/messages/latest', (req, res) => {
   res.json(latest);
@@ -63,6 +57,12 @@ server.get('/reset', (req, res) => {
   latest = [];
   db.messages = [];
   res.json({message: 'ok'});
+});
+
+
+server.get('/user/login', (req, res) => {
+  const user = db.users.find(user => user.name === req.body.name) || generateUser(req.body.name);
+  res.json(user);
 });
 
 server.use((req, res, next) => {

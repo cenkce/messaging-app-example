@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from "react";
-import { ActivityIndicator, Button, KeyboardAvoidingView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Button, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from "react-native";
 import { ScreenComponent } from "..";
 import { comonStyles } from "../common-styles";
-import { useUserInfo } from "./MessagingContext";
+import { useUserLogin } from "./MessagingContext";
 
 const style = StyleSheet.create({
   field: { height: 40, borderColor: 'gray', width: 100, borderWidth: 1, borderRadius: 4, padding: 5 },
@@ -11,25 +11,38 @@ const style = StyleSheet.create({
 });
 
 export const HomeScreen: ScreenComponent = (props) => {
-  const [username, setUserName] = useState<string>('');
-  const isValidUsername = username !== '' && username.length <= 2;
+  const [name, setName] = useState('');
+  const login = useUserLogin();
+  const [status, setStatus] = useState<'idle' | 'waiting'>('idle')
   const onContinue = useCallback(() => {
-    props.navigation.navigate('Messaging');
+    if (status !== 'waiting') {
+      login(name)
+        .then(() => {
+          props.navigation.navigate('Messaging');
+          setStatus('idle');
+          setName('');
+        });
+      setStatus('waiting');
+    }
   }, []);
 
-  const user = useUserInfo();
-
+  // const [user, setNickName] = useMessagingService();
+  const isValidUsername = !!name && name.length > 2;
 
   return <View style={comonStyles.pageRoot}>
-    {user.id
-      ? <KeyboardAvoidingView style={style.fieldContainer} behavior="position">
+    {status === 'idle'
+      ? <KeyboardAvoidingView
+        style={style.fieldContainer}
+        behavior={(Platform.OS === 'ios') ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.select({ ios: 100, android: 500 })}
+      >
         <TextInput
-          style={[style.field, isValidUsername ? style.fieldError : {}]}
-          onChangeText={(text) => setUserName(text)}
-          value={username}
+          style={[style.field, !isValidUsername && !!name ? style.fieldError : {}]}
+          onChangeText={(text) => setName(text)}
+          value={name}
         />
-        <Text style={style.fieldError}>{isValidUsername ? 'Username must be longer than 2 characters' : ''}</Text>
-        <Button title='Continue' onPress={onContinue} disabled={!username || isValidUsername} />
+        <Text style={style.fieldError}>{!isValidUsername && name ? 'Username must be longer than 2 characters' : ''}</Text>
+        <Button title='Continue' onPress={onContinue} disabled={!name || !isValidUsername} />
       </KeyboardAvoidingView>
       : <ActivityIndicator size="small" color="#00ff00" />
     }
@@ -39,5 +52,5 @@ export const HomeScreen: ScreenComponent = (props) => {
 
 HomeScreen.navigationOptions = {
   title: 'Messaging Home',
-  headerBackTitle: 'Leave Messaging'
+  headerBackTitle: 'Leave'
 };

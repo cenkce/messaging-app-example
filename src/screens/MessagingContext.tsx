@@ -28,17 +28,29 @@ const MessagingServiceContext = React.createContext<MessagingService>({
   user: EmptyUser
 });
 
-export function MessagingServiceProvider(props: PropsWithChildren<{}>) {
-  const [loaded, setLoaded] = useState(false);
-  useEffect(() => {
-    fetch(getUrl('user'))
+export function useUserLogin() {
+  const service = useMessagingService();
+  const login = useCallback((name: string) =>
+    fetch(getUrl('user/login'), {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
       .then((resp) => {
         return resp.json()
       })
       .then((user) => {
-        setUser(user);
-      })
-  }, [])
+        service.setUser(user);
+      }),
+    [service])
+  return login;
+}
+
+export function MessagingServiceProvider(props: PropsWithChildren<{}>) {
+  const [loaded, setLoaded] = useState(false);
+
   const [user, setUser] = useState<User>(EmptyUser);
   const services = useMemo(() => ({
     get loaded() {
@@ -63,12 +75,10 @@ function getUrl(endpoint: string) {
   return `http://${host}:${port}/${endpoint}`;
 }
 
-export function useUserInfo(name?: string) {
+export function useMessagingService(name?: string) {
   const services = useContext(MessagingServiceContext);
 
-  const user = useMemo(() => services.user, [services.user]);
-
-  return user;
+  return services;
 }
 
 export function useGetMessages() {
@@ -112,7 +122,7 @@ export function useGetMessages() {
   return services.loaded;
 }
 
-export function useSendMMessages() {
+export function useSendMessages() {
   const dispatch = useMessagingDispatcher();
   const sendMessage = useCallback((text: string) => {
     fetch(
@@ -142,6 +152,7 @@ type actions =
   | { type: "add-message", payload: MessageResponseType | MessageResponseType[] }
   | { type: "init-messages", payload: MessageResponseType[] }
 
+// Groups messages by user, if the messages' user is same respectively
 function groupMessages(list: MessageResponseType[]) {
   return list.reduce<MessageSection[]>((acc, item) => {
     const prevMessages = acc.length ? acc[acc.length - 1] : { title: '', data: [] };

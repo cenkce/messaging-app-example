@@ -2,7 +2,7 @@ import moment from 'moment';
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Image, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, SectionList, SectionListRenderItem, StyleSheet, Text, TextInput, View } from "react-native";
 import { MessageResponseType, ScreenComponent } from "..";
-import { useGetMessages, useMessagingState, useSendMMessages, useUserInfo } from "./MessagingContext";
+import { useGetMessages, useMessagingService, useMessagingState, useSendMessages } from "./MessagingContext";
 
 const borderRadius = 15;
 
@@ -23,6 +23,7 @@ const style = StyleSheet.create({
     borderBottomRightRadius: borderRadius,
     borderTopLeftRadius: borderRadius,
     borderTopRightRadius: borderRadius,
+    minWidth: 140
   },
   sectionBubbleBody: {
     flexDirection: "row",
@@ -86,15 +87,20 @@ const style = StyleSheet.create({
     paddingBottom: 0,
     backgroundColor: "#e3e3e3",
     borderColor: "#f4f4f4",
+  },
+  sectionUserName: {
+    marginBottom: 5,
+    alignSelf: "flex-start"
   }
 })
 
 
 const MessagingSection = (props: { item: MessageResponseType, index: number }) => {
   // const dateString = useMemo(() => )
-  const user = useUserInfo();
+  const { user } = useMessagingService();
   const isOwner = props.item.user.id === user.id;
   return <View style={[style.sectionBubble, isOwner ? style.sectionBubbleOwner : {}]}>
+    <Text style={style.sectionUserName}>{isOwner ? user.nickName : props.item.user.name}</Text>
     <View style={[style.sectionBubbleBody, isOwner ? style.sectionBubbleBodyOwner : {}]}>
       <Image
         source={{ uri: props.item.user.avatarUrl }}
@@ -129,7 +135,24 @@ export const MessagingScreen: ScreenComponent = (props) => {
   }, [listRef.current, state.grouppedMessages]);
 
   const [firstLoad, setFirstLoad] = useState(false);
+
+  useEffect(() => {
+    // AutoScrollToEnd ability. If the component is newly loaded or scrolled at the end.
+    (!firstLoad || attheEnd) && scrollToEndWithTimer();
+  }, [listRef.current, state.grouppedMessages, loaded])
+
   const [attheEnd, setAttheEnd] = useState(false);
+  const { user, setLoaded } = useMessagingService();
+
+  console.log(user);
+
+  useEffect(() => {
+    props.navigation.getParam('title') !== user.nickName
+      && props.navigation.setParams({ title: user.nickName });
+  }, [user.nickName, props.navigation]);
+  useEffect(() => {
+    return () => setLoaded(false);
+  }, []);
 
   function scrollToEnd() {
     listRef.current
@@ -153,17 +176,12 @@ export const MessagingScreen: ScreenComponent = (props) => {
     }, 500);
   }
 
-  useEffect(() => {
-    // Auto ScrollToEnd ability. If component is newly loaded or scroll at the end.
-    (!firstLoad || attheEnd) && scrollToEndWithTimer();
-  }, [listRef.current, state.grouppedMessages, loaded])
-
   const renderHeader = useCallback<any>((params: any) => (
     <Text style={style.sectionHeader}>{params.section.title}</Text>
   ), []);
   const keyExtractor = useCallback((item: any, index: number) => item + index, []);
   const List: SectionList<MessageResponseType> = SectionList;
-  const sendMessage = useSendMMessages();
+  const sendMessage = useSendMessages();
 
   return <SafeAreaView style={{ flexGrow: 1 }}>
     <KeyboardAvoidingView
@@ -185,7 +203,6 @@ export const MessagingScreen: ScreenComponent = (props) => {
             : setAttheEnd(false)
         }}
         onEndReachedThreshold={0}
-
       />
       <View style={style.inputContainer}>
         <TextInput
@@ -207,3 +224,6 @@ export const MessagingScreen: ScreenComponent = (props) => {
     </KeyboardAvoidingView>
   </SafeAreaView>
 }
+
+MessagingScreen.navigationOptions = ({ navigation }) =>
+  ({ title: navigation.getParam('title') || '' })
