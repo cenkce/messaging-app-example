@@ -20,11 +20,11 @@ export const HomeScreen: ScreenComponent = (props) => {
         .then(() => {
           props.navigation.navigate('Messaging');
           setStatus('idle');
-          setName('');
         });
+      setName('');
       setStatus('waiting');
     }
-  }, []);
+  }, [name]);
 
   // const [user, setNickName] = useMessagingService();
   const isValidUsername = !!name && name.length > 2;

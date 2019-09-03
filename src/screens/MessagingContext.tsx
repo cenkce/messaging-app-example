@@ -18,8 +18,7 @@ const MessagingContext = React.createContext<MessagingState>(initialMessagingSta
 const EmptyUser: User = {
   id: '',
   avatarUrl: '',
-  name: '',
-  nickName: ''
+  name: ''
 }
 const MessagingServiceContext = React.createContext<MessagingService>({
   loaded: false,
@@ -42,6 +41,7 @@ export function useUserLogin() {
         return resp.json()
       })
       .then((user) => {
+        debugger;
         service.setUser(user);
       }),
     [service])
@@ -68,8 +68,11 @@ export function MessagingServiceProvider(props: PropsWithChildren<{}>) {
   </MessagingServiceContext.Provider>;
 }
 
-const host = '165.22.157.197';
-const port = '80';
+const host = 'localhost'
+// '165.22.157.197';
+
+const port = '3000'
+// '80';
 
 function getUrl(endpoint: string) {
   return `http://${host}:${port}/${endpoint}`;
@@ -124,12 +127,13 @@ export function useGetMessages() {
 
 export function useSendMessages() {
   const dispatch = useMessagingDispatcher();
+  const { user } = useMessagingService();
   const sendMessage = useCallback((text: string) => {
     fetch(
       getUrl('messages'),
       {
         method: 'POST',
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, user }),
         headers: {
           'Content-Type': 'application/json'
         }

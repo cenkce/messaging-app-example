@@ -16,7 +16,6 @@ export type User = {
   id: string,
   name: string,
   avatarUrl: string,
-  nickName: string
 }
 
 export type MessagingService = {

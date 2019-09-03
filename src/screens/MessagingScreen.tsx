@@ -100,7 +100,7 @@ const MessagingSection = (props: { item: MessageResponseType, index: number }) =
   const { user } = useMessagingService();
   const isOwner = props.item.user.id === user.id;
   return <View style={[style.sectionBubble, isOwner ? style.sectionBubbleOwner : {}]}>
-    <Text style={style.sectionUserName}>{isOwner ? user.nickName : props.item.user.name}</Text>
+    <Text style={style.sectionUserName}>{props.item.user.name}</Text>
     <View style={[style.sectionBubbleBody, isOwner ? style.sectionBubbleBodyOwner : {}]}>
       <Image
         source={{ uri: props.item.user.avatarUrl }}
@@ -115,7 +115,7 @@ const MessagingSection = (props: { item: MessageResponseType, index: number }) =
     </Text>
   </View>
 }
-
+let timeout: number;
 export const MessagingScreen: ScreenComponent = (props) => {
   const renderItem = useCallback<SectionListRenderItem<MessageResponseType>>((props) => {
     return <MessagingSection item={props.item} index={props.index} />
@@ -144,14 +144,15 @@ export const MessagingScreen: ScreenComponent = (props) => {
   const [attheEnd, setAttheEnd] = useState(false);
   const { user, setLoaded } = useMessagingService();
 
-  console.log(user);
-
   useEffect(() => {
-    props.navigation.getParam('title') !== user.nickName
-      && props.navigation.setParams({ title: user.nickName });
-  }, [user.nickName, props.navigation]);
+    props.navigation.getParam('title') !== user.name
+      && props.navigation.setParams({ title: user.name });
+  }, [user.name, props.navigation]);
   useEffect(() => {
-    return () => setLoaded(false);
+    return () => {
+      setLoaded(false);
+      timeout && setTimeout(timeout);
+    }
   }, []);
 
   function scrollToEnd() {
@@ -165,11 +166,13 @@ export const MessagingScreen: ScreenComponent = (props) => {
   }
 
   function scrollToEndWithTimer() {
-    setTimeout(() => {
+    timeout = setTimeout(() => {
       try {
         scrollToEnd();
-        loaded
-          && setFirstLoad(true);
+        if (loaded) {
+          setFirstLoad(true);
+          setAttheEnd(true);
+        }
       } catch {
         scrollToEndWithTimer();
       }
@@ -182,6 +185,13 @@ export const MessagingScreen: ScreenComponent = (props) => {
   const keyExtractor = useCallback((item: any, index: number) => item + index, []);
   const List: SectionList<MessageResponseType> = SectionList;
   const sendMessage = useSendMessages();
+  const onChangeText = useCallback((text) => setMessage(text), [])
+  const onPress = useCallback(() => {
+    message && sendMessage(message);
+    setMessage(undefined)
+  },
+    [message]
+  )
 
   return <SafeAreaView style={{ flexGrow: 1 }}>
     <KeyboardAvoidingView
@@ -213,12 +223,12 @@ export const MessagingScreen: ScreenComponent = (props) => {
           style={style.input}
           placeholder="Type a message"
           returnKeyType="send"
-          onChangeText={(text) => setMessage(text)}
+          onChangeText={onChangeText}
         />
         <Button
           title="Send"
           disabled={!message}
-          onPress={() => { message && sendMessage(message); setMessage(undefined) }}
+          onPress={onPress}
         />
       </View>
     </KeyboardAvoidingView>

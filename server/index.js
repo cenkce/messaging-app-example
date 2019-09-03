@@ -59,10 +59,8 @@ server.get('/reset', (req, res) => {
   res.json({message: 'ok'});
 });
 
-
 server.post('/user/login', (req, res) => {
-  console.log(req.body.name);
-  let user = db.users.find(user => user.name === req.body.name);
+  let user = db.users.find(user => user.name.toLowerCase() === req.body.name.toLowerCase());
   if(!user){
     user = generateUser(req.body.name);
     db.users.push(user);
@@ -70,12 +68,12 @@ server.post('/user/login', (req, res) => {
   res.json(user);
 });
 
-server.use((req, res, next) => {
-  if (req.method === 'POST') {
-    req.body = createMessage(req.body.text);
-  }
-  next();
-});
+// server.use((req, res, next) => {
+//   if (req.method === 'POST') {
+//     req.body = createMessage(req.body.text);
+//   }
+//   next();
+// });
 server.use(middlewares)
 server.use(router)
 server.listen(process.env.PORT || 3000, '0.0.0.0', () => {
