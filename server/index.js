@@ -61,8 +61,12 @@ server.get('/reset', (req, res) => {
 
 
 server.post('/user/login', (req, res) => {
-  const user = db.users.find(user => user.name === req.body.name) || generateUser(req.body.name);
-  db.users.push(user);
+  console.log(req.body.name);
+  const user = db.users.find(user => user.name === req.body.name);
+  if(!user){
+    user = generateUser(req.body.name);
+    db.users.push(user);
+  }
   res.json(user);
 });
 
