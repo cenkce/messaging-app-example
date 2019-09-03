@@ -60,8 +60,9 @@ server.get('/reset', (req, res) => {
 });
 
 
-server.get('/user/login', (req, res) => {
+server.post('/user/login', (req, res) => {
   const user = db.users.find(user => user.name === req.body.name) || generateUser(req.body.name);
+  db.users.push(user);
   res.json(user);
 });
 
