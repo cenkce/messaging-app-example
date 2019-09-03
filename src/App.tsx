@@ -7,7 +7,7 @@ import { MessagingScreen } from './screens/MessagingScreen';
 const AppNavigator = createStackNavigator({
   Home: HomeScreen,
   Messaging: MessagingScreen
-}, { initialRouteName: "Messaging" });
+}, { initialRouteName: "Home" });
 
 const AppContainer = createAppContainer(AppNavigator);
 

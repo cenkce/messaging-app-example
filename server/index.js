@@ -33,23 +33,30 @@ function generateMessage(){
 let latest = [];
 let initialMessages = db.messages.slice();
 
-setInterval(() => {
-  const message = generateMessage();
-  latest.push(message);
-  db.messages.push(message);
-}, 30000);
+// setInterval(() => {
+//   const message = generateMessage();
+//   latest.push(message);
+//   db.messages.push(message);
+// }, 30000);
 
 // Resets messages every 10 mmiutes.
-setInterval(() => {
-  const message = generateMessage();
-  latest = [];
-  db.messages = initialMessages;
-}, 600000);
+// setInterval(() => {
+//   const message = generateMessage();
+//   latest = [];
+//   db.messages = initialMessages;
+// }, 600000);
 
 
 server.get('/messages/latest', (req, res) => {
   res.json(latest);
   latest = [];
+});
+
+server.get('/messages/addRandom', (req, res) => {
+  const message = generateMessage();
+  latest.push(message);
+  db.messages.push(message);
+  res.json(message);
 });
 
 server.get('/reset', (req, res) => {

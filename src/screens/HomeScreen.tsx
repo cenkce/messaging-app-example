@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { ActivityIndicator, Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Button, KeyboardAvoidingView, StyleSheet, Text, TextInput, View } from "react-native";
 import { ScreenComponent } from "..";
 import { comonStyles } from "../common-styles";
 import { useUserInfo } from "./MessagingContext";
@@ -22,7 +22,7 @@ export const HomeScreen: ScreenComponent = (props) => {
 
   return <View style={comonStyles.pageRoot}>
     {user.id
-      ? <View style={style.fieldContainer}>
+      ? <KeyboardAvoidingView style={style.fieldContainer} behavior="position">
         <TextInput
           style={[style.field, isValidUsername ? style.fieldError : {}]}
           onChangeText={(text) => setUserName(text)}
@@ -30,7 +30,7 @@ export const HomeScreen: ScreenComponent = (props) => {
         />
         <Text style={style.fieldError}>{isValidUsername ? 'Username must be longer than 2 characters' : ''}</Text>
         <Button title='Continue' onPress={onContinue} disabled={!username || isValidUsername} />
-      </View>
+      </KeyboardAvoidingView>
       : <ActivityIndicator size="small" color="#00ff00" />
     }
   </View>

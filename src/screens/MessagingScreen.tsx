@@ -60,11 +60,16 @@ const style = StyleSheet.create({
     alignSelf: "center",
     fontWeight: 'bold'
   },
+  sendButton: {
+    height: 34
+  },
   input: {
     alignSelf: "stretch",
-    height: 30,
+    height: 34,
+    marginRight: 5,
     paddingLeft: 15,
     paddingRight: 15,
+    fontSize: 12,
     backgroundColor: 'white',
     flexGrow: 1
   },
@@ -107,7 +112,6 @@ const MessagingSection = (props: { item: MessageResponseType, index: number }) =
 
 export const MessagingScreen: ScreenComponent = (props) => {
   const renderItem = useCallback<SectionListRenderItem<MessageResponseType>>((props) => {
-    console.log("index : ", props.index);
     return <MessagingSection item={props.item} index={props.index} />
   }, []);
 
@@ -150,7 +154,8 @@ export const MessagingScreen: ScreenComponent = (props) => {
   }
 
   useEffect(() => {
-    !firstLoad && scrollToEndWithTimer();
+    // Auto ScrollToEnd ability. If component is newly loaded or scroll at the end.
+    (!firstLoad || attheEnd) && scrollToEndWithTimer();
   }, [listRef.current, state.grouppedMessages, loaded])
 
   const renderHeader = useCallback<any>((params: any) => (
@@ -168,18 +173,18 @@ export const MessagingScreen: ScreenComponent = (props) => {
       keyboardVerticalOffset={Platform.select({ ios: 90, android: 500 })}
     >
       <List
-        onViewableItemsChanged={(info) => {
-          console.log(info);
-        }}
-        initialNumToRender={10}
         style={style.sectionList}
         ref={listRef}
         renderItem={renderItem}
         renderSectionHeader={renderHeader}
         sections={state.grouppedMessages}
         keyExtractor={keyExtractor}
-        onEndReached={() => setAttheEnd(true)}
-        onEndReachedThreshold={0.5}
+        onEndReached={(e) => {
+          e.distanceFromEnd < 50
+            ? setAttheEnd(true)
+            : setAttheEnd(false)
+        }}
+        onEndReachedThreshold={0}
 
       />
       <View style={style.inputContainer}>
