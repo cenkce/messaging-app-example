@@ -151,7 +151,7 @@ export const MessagingScreen: ScreenComponent = (props) => {
   useEffect(() => {
     return () => {
       setLoaded(false);
-      timeout && setTimeout(timeout);
+      timeout && clearTimeout(timeout);
     }
   }, []);
 

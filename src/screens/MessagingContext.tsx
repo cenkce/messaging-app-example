@@ -41,7 +41,6 @@ export function useUserLogin() {
         return resp.json()
       })
       .then((user) => {
-        debugger;
         service.setUser(user);
       }),
     [service])
