@@ -16,7 +16,7 @@ npm run android
 
 ## Server
 
-Url : http://165.22.157.197/
+Url : http://localhost:3000
 
 - Users: http://localhost:3000/users
 - Messages : http://localhost:3000/messages
