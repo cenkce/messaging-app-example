@@ -18,7 +18,7 @@ npm run android
 
 Url : http://165.22.157.197/
 
-- Users: http://165.22.157.197/users
-- Messages : http://165.22.157.197/messages
-- Add a random message : http://165.22.157.197/messages/addRandom
-- Reset api to initial state : http://165.22.157.197/reset
+- Users: http://localhost:3000/users
+- Messages : http://localhost:3000/messages
+- Add a random message : http://localhost:3000/messages/addRandom
+- Reset api to initial state : http://localhost:3000/reset
