@@ -68,11 +68,10 @@ export function MessagingServiceProvider(props: PropsWithChildren<{}>) {
 }
 
 const localhostConfig = { host: 'localhost', port: 3000 }
-const remoteConfig = { host: '165.22.157.197', port: 80 }
 
 const getUrl = ((config) => (endpoint: string) => {
   return `http://${config.host}:${config.port}/${endpoint}`;
-})(remoteConfig)
+})(localhostConfig)
 
 export function useMessagingService(name?: string) {
   const services = useContext(MessagingServiceContext);
